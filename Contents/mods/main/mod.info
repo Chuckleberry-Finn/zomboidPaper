@@ -1,6 +1,6 @@
-id=ChuckTemplate
-name=ChuckTemplate
-description= 
+id=ZomboidPaperAPI
+name=Zomboid Paper API
+description=This is an API which allows "paper" via map items.
 poster=poster.png
 tags=Build 41
 versionMin=41.0
