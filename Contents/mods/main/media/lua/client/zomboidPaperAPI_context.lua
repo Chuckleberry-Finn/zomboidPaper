@@ -26,8 +26,8 @@ paperContext.paperSymbols = ISWorldMapSymbols:derive("paperContext.paperSymbols"
 function paperContext.paperSymbols:renderSymbol(symbol, x, y) end
 
 function paperContext.paperWrapper:close()
-    self.mapUI.symbolsUI:removeFromUIManager()
-    self.mapUI.freeHandUI:removeFromUIManager()
+    if self.mapUI.symbolsUI then self.mapUI.symbolsUI:removeFromUIManager() end
+    if self.mapUI.freeHandUI then self.mapUI.freeHandUI:removeFromUIManager() end
     ISMapWrapper.close(self)
 end
 

@@ -1,4 +1,5 @@
-return --- RETURN TO STOP THIS FROM BEING READ NORMALLY
+if 1==1 then return end
+--- RETURN TO STOP THIS FROM BEING READ NORMALLY
 
 local paper = require "zomboidPaperAPI_define"
 paper.applyPaperInit("EXAMPLE_ITEM")
