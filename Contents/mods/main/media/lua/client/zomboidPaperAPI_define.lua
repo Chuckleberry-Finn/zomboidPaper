@@ -10,7 +10,7 @@ function dndPaper.isValid(itemType) return (dndPaper.types[itemType]) end
 function dndPaper.applyPaperInit(itemType)
     
     local buffer = 10
-    local texPath = "media/ui/"..itemType.."1.png"
+    local texPath = "media/textures/zomboidPaper/"..itemType.."1.png"
     local texture = getTexture(texPath)
 
     if not texture then print("ZOMBOID PAPER API: NO TEXTURE FOUND FOR "..itemType.."("..texPath..")") return end

@@ -1,3 +1,8 @@
 [ 2/7/24 ]
 - Fixes issues with closing UI.
 [ ------ ]
+
+[ 2/17/24 ]
+- Moves drawing paper to ZomboidPaperAPI + fixes UI/model conflict.
+- Fixes issue with trying to translate "<" and ">".
+[ ------ ]

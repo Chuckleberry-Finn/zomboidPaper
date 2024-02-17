@@ -116,13 +116,13 @@ function paperContext.paperUI:createChildren()
     self.pageLabel:instantiate()
     self:addChild(self.pageLabel)
 
-    self.nextPage = ISButton:new(self:getWidth()-35, self.ok.y, 25, self.ok.height, getText(">"), self, paperContext.onNextPage)
+    self.nextPage = ISButton:new(self:getWidth()-35, self.ok.y, 25, self.ok.height, ">", self, paperContext.onNextPage)
     self.nextPage:initialise()
     self.nextPage:instantiate()
     self.nextPage.borderColor = {r=1, g=1, b=1, a=0.4}
     self:addChild(self.nextPage)
 
-    self.prevPage = ISButton:new(self.nextPage.x-29, self.ok.y, 25, self.ok.height, getText("<"), self, paperContext.onPrevPage)
+    self.prevPage = ISButton:new(self.nextPage.x-29, self.ok.y, 25, self.ok.height, "<", self, paperContext.onPrevPage)
     self.prevPage:initialise()
     self.prevPage:instantiate()
     self.prevPage.borderColor = {r=1, g=1, b=1, a=0.4}
@@ -136,7 +136,7 @@ function paperContext:onPageSelect(pageChange)
     local maxPage = map:getModData()["paperAPI_paperPageMax"] or 1
     local page = math.min(maxPage, math.max(1,(map:getModData()["paperAPI_paperPage"] or 1) + (pageChange or 0)))
 
-    local texPath = "media/ui/"..map:getType()..page..".png"
+    local texPath = "media/textures/zomboidPaper/"..map:getType()..page..".png"
     ---@type UIWorldMapV1
     local mapAPI = self.javaObject:getAPIv1()
     ---@type WorldMapStyleV1
@@ -247,7 +247,7 @@ function paperContext.onCheckPaper(map, player)
     local paperPage = map:getModData()["paperAPI_paperPage"]
     local maxPage = map:getModData()["paperAPI_paperPageMax"] or 1
 
-    local texPath = "media/ui/"..map:getType()..paperPage..".png"
+    local texPath = "media/textures/zomboidPaper/"..map:getType()..paperPage..".png"
     local texture = getTexture(texPath)
     if not texture then return end
 
