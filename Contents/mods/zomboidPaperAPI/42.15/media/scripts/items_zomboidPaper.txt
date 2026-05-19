@@ -4,8 +4,7 @@ module Base
     item DrawingPaper {
 		DisplayCategory = ZomboidPaper,
 		Weight = 0.1,
-		Type = Map,
-		DisplayName = Drawing Paper,
+		ItemType = base:map,
 		Icon = zomboidPaper,
 		Map = paperAPI_DrawingPaper,
 		WorldStaticModel = DrawingPaper,

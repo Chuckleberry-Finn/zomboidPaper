@@ -2,13 +2,15 @@ local dndPaper = {}
 
 require 'Maps/ISMapDefinitions'
 
-
 dndPaper.types = {}
-function dndPaper.isValid(itemType) return (dndPaper.types[itemType]) end
 
 
-function dndPaper.applyPaperInit(itemType)
-    
+function dndPaper.isValid(itemType) return (dndPaper.types[itemType] ~= nil) end
+
+
+function dndPaper.applyPaperInit(itemType, maxPage)
+    maxPage = maxPage or 1
+
     local buffer = 10
     local texPath = "media/textures/zomboidPaper/"..itemType.."1.png"
     local texture = getTexture(texPath)
@@ -21,9 +23,9 @@ function dndPaper.applyPaperInit(itemType)
         local mapAPI = mapUI.javaObject:getAPIv1()
         MapUtils.initDirectoryMapData(mapUI, 'media/maps/Muldraugh, KY')
         mapAPI:setBoundsInSquares(buffer, buffer, x2, y2)
+        MapUtils.initDefaultTextLayersV3(mapUI)
     end
-
-    dndPaper.types[itemType] = true
+    dndPaper.types[itemType] = { maxPage = maxPage }
 end
 
 

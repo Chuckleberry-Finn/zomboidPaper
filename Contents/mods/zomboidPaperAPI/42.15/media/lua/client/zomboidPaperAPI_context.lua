@@ -59,12 +59,40 @@ function paperContext.paperUI:render()
 end
 
 
+function paperContext.paperUI:updateButtons()
+    self.editSymbolsBtn.enable = self:canWrite() or self:canErase()
+    if self.symbolsUI.currentTool then
+        self.ok:setTitle(getText("UI_Cancel"))
+    else
+        self.ok:setTitle(getText("UI_Close"))
+    end
+    local text = self.symbolsUI:getJoypadAButtonText()
+    if text then
+        self.placeSymbBtn.enable = true
+        self.placeSymbBtn:setTitle(text)
+        self.placeSymbBtn:setWidthToTitle(self.placeSymbBtn.width)
+    else
+        self.placeSymbBtn.enable = false
+    end
+    if not self.editSymbolsBtn.enable then
+        self.editSymbolsBtn.tooltip = getText("Tooltip_Map_CantWrite")
+    else
+        self.editSymbolsBtn.tooltip = nil
+    end
+
+    local isMouse = (self.playerNum == 0) and (getJoypadData(self.playerNum) == nil or wasMouseActiveMoreRecentlyThanJoypad())
+    self.ok:setVisible(isMouse)
+    self.editSymbolsBtn:setVisible(isMouse)
+    self.scaleBtn:setVisible(isMouse)
+    self.placeSymbBtn:setVisible(isMouse)
+end
+
+
 local FONT_HGT_SMALL = getTextManager():getFontHeight(UIFont.Small)
 function paperContext.paperUI:createChildren()
 
     local symbolsWidth = paperContext.paperSymbols.RequiredWidth()
     self.symbolsUI = paperContext.paperSymbols:new(self.width - 10 - symbolsWidth, 10, symbolsWidth, 200, self)
-    --self:addChild(self.symbolsUI)
     self.symbolsUI:addToUIManager()
     self.symbolsUI:setVisible(false)
 
@@ -145,8 +173,7 @@ function paperContext:onPageSelect(pageChange)
     local layer = styleAPI:getLayerByName("paperAPI")
     layer:removeAllTexture()
     layer:addTexture(0, texPath)
-
-    local symbolsAPI = mapAPI:getSymbolsAPI()
+    local symbolsAPI = self.javaObject:getAPIv3():getSymbolsAPIv2()
     paperContext.loadSymbols(map, symbolsAPI, page)
 
     map:getModData()["paperAPI_paperPage"] = page
@@ -194,7 +221,10 @@ function paperContext.loadSymbols(map, symbolsAPI, newPage, noSave)
             }
 
             if symbol:isTexture() then symbolAdded.symbolID = symbol:getSymbolID() end
-            if symbol:isText() then symbolAdded.text = symbol:getTranslatedText() end
+            if symbol:isText() then
+                symbolAdded.text = symbol:getTranslatedText()
+                symbolAdded.layerID = symbol:getLayerID()
+            end
 
             table.insert(map:getModData()["paperAPI_symbolsOnPage"][currentPage], symbolAdded)
         end
@@ -209,7 +239,10 @@ function paperContext.loadSymbols(map, symbolsAPI, newPage, noSave)
                 local addedSymbol
 
                 if symbol.symbolID then addedSymbol = symbolsAPI:addTexture(symbol.symbolID, symbol.x, symbol.y) end
-                if symbol.text then addedSymbol = symbolsAPI:addTranslatedText(symbol.text, UIFont.Handwritten, symbol.x, symbol.y) end
+                if symbol.text then
+                    local layerID = symbol.layerID or symbolsAPI:getDefaultTextLayerID()
+                    addedSymbol = symbolsAPI:addTranslatedText(symbol.text, layerID, symbol.x, symbol.y)
+                end
 
                 if addedSymbol then
                     addedSymbol:setRGBA(symbol.r, symbol.g, symbol.b, 1.0)
@@ -243,9 +276,14 @@ function paperContext.onCheckPaper(map, player)
 
     local titleBarHgt = ISCollapsableWindow.TitleBarHeight()
 
+    if not map:getModData()["paperAPI_paperPageMax"] then
+        local typeInfo = paperAPI.types[map:getType()]
+        map:getModData()["paperAPI_paperPageMax"] = (typeInfo and typeInfo.maxPage) or 1
+    end
+
     map:getModData()["paperAPI_paperPage"] = map:getModData()["paperAPI_paperPage"] or 1
     local paperPage = map:getModData()["paperAPI_paperPage"]
-    local maxPage = map:getModData()["paperAPI_paperPageMax"] or 1
+    local maxPage = map:getModData()["paperAPI_paperPageMax"]
 
     local texPath = "media/textures/zomboidPaper/"..map:getType()..paperPage..".png"
     local texture = getTexture(texPath)
@@ -279,10 +317,6 @@ function paperContext.onCheckPaper(map, player)
     local mapAPI = mapUI.javaObject:getAPIv1()
     ---@type WorldMapStyleV1
     local styleAPI = mapAPI:getStyleAPI()
-
-    --local symbolsAPI = mapAPI:getSymbolsAPI()
-    --paperContext.loadSymbols(map, symbolsAPI, paperPage, true)
-
     local layer = styleAPI:newTextureLayer("paperAPI")
     layer:setMinZoom(0)
     layer:addFill(0, 255, 255, 255, 255)
@@ -298,8 +332,6 @@ end
 
 ---@param context ISContextMenu
 function paperContext.addInventoryItemContext(playerID, context, items)
-    local playerObj = getSpecificPlayer(playerID)
-
     for _, v in ipairs(items) do
 
         ---@type InventoryItem
@@ -314,14 +346,17 @@ function paperContext.addInventoryItemContext(playerID, context, items)
         if isPaper then
 
             local readOption = context:getOptionFromName(getText("ContextMenu_CheckMap"))
-            readOption.name = getText("ContextMenu_Read")
-            readOption.onSelect = paperContext.onCheckPaper
-            --context:addOption(getText("ContextMenu_CheckMap"), map, ISInventoryPaneContextMenu.onCheckMap, player)
+            if readOption then
+                readOption.name = getText("ContextMenu_Read")
+                readOption.onSelect = paperContext.onCheckPaper
+            end
 
             local renameOption = context:getOptionFromName(getText("ContextMenu_RenameMap"))
-            renameOption.name = getText("ContextMenu_RenameBag")
-            readOption.onSelect = paperContext.onCheckPaper
-            --context:addOption(getText("ContextMenu_RenameMap"), map, ISInventoryPaneContextMenu.onRenameMap, player)
+            if renameOption then
+                renameOption.name = getText("ContextMenu_RenameBag")
+                renameOption.onSelect = paperContext.onCheckPaper
+            end
+
         end
         break
     end
