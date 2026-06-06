@@ -1,6 +1,6 @@
 local dndPaper = {}
 
-require 'Maps/ISMapDefinitions'
+require 'ISUI/Maps/ISMapDefinitions'
 
 dndPaper.types = {}
 
